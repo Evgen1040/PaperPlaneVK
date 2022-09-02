@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>testGame</title>
+    <title>PaperPlane2020</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
 	    <!-- Yandex Games SDK -->
@@ -27,14 +27,14 @@
     <script>
       const hideFullScreenButton = "";
       const buildUrl = "Build";
-      const loaderUrl = buildUrl + "/VKTest.loader.js";
+      const loaderUrl = buildUrl + "/PaperPlaneVK.loader.js";
       const config = {
-        dataUrl: buildUrl + "/VKTest.data.unityweb",
-        frameworkUrl: buildUrl + "/VKTest.framework.js.unityweb",
-        codeUrl: buildUrl + "/VKTest.wasm.unityweb",
+        dataUrl: buildUrl + "/PaperPlaneVK.data.unityweb",
+        frameworkUrl: buildUrl + "/PaperPlaneVK.framework.js.unityweb",
+        codeUrl: buildUrl + "/PaperPlaneVK.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "DefaultCompany",
-        productName: "testGame",
+        productName: "PaperPlane2020",
         productVersion: "1.0",
       };
 
@@ -63,7 +63,6 @@
 
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
         container.className = "unity-mobile";
-        config.devicePixelRatio = 1;
       }
       loadingCover.style.display = "";
 	  
