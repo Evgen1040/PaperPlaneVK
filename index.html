@@ -24,6 +24,7 @@
       </div>
     </div>
     <script>
+      const hideFullScreenButton = "";
       const buildUrl = "Build";
       const loaderUrl = buildUrl + "/PaperPlaneVK.loader.js";
       const config = {
@@ -78,6 +79,9 @@
 		  newInstance = unityInstance;
           loadingCover.style.display = "none";
           if (canFullscreen) {
+            if (!hideFullScreenButton) {
+              fullscreenButton.style.display = "";
+            }
             fullscreenButton.onclick = () => {
               unityInstance.SetFullscreen(1);
             };
@@ -147,4 +151,3 @@
       document.body.appendChild(script);
     </script>
   </body>
-</html>
