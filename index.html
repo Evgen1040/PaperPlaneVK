@@ -23,7 +23,7 @@
         <div class="spinner"></div>
       </div>
     </div>
-   <div id="unity-fullscreen-button" style="display: none;"></div>
+    <div id="unity-fullscreen-button" style="display: none;"></div>
     <script>
       const hideFullScreenButton = "true";
       const buildUrl = "Build";
@@ -63,10 +63,10 @@
 
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
         container.className = "unity-mobile";
+        config.devicePixelRatio = 1;
       }
       loadingCover.style.display = "";
 	  
-
 	  var newInstance = null;
 	  
       const script = document.createElement("script");
@@ -152,3 +152,4 @@
       document.body.appendChild(script);
     </script>
   </body>
+</html>
