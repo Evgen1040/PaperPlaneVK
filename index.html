@@ -8,7 +8,7 @@
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
 	    <!-- Yandex Games SDK -->
-    <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
+    <script src="https://yandex.ru/games/sdk/v2"></script>
   </head>
   <body class="dark">
     <div id="unity-container" class="unity-desktop">
@@ -67,6 +67,9 @@
       }
       loadingCover.style.display = "";
 	  
+	  var player;
+      var sdk;
+      var payments = null;
 	  var newInstance = null;
 	  
       const script = document.createElement("script");
@@ -92,62 +95,110 @@
         });
       };
 	  
-	  vkBridge.send('VKWebAppInit');
-	  
-	  function auth(){
-        vkBridge.send('VKWebAppGetUserInfo').then(_info =>{
-          console.log(_info);
-          newInstance.SendMessage('VKSDK', 'AuthenticateSuccess', JSON.stringify(_info));
-        });
+	  YaGames.init({
+            adv: {
+                onAdvClose: wasShown => {
+                      console.info('adv closed!');
+                }
+            }
+        })
+        .then(ysdk => {
+            sdk = ysdk;
+            sdk.adv.showFullscreenAdv({callbacks:{}});
+      });
+
+
+      function auth(){
+        sdk.auth.openAuthDialog().then(() => {
+                // Игрок успешно авторизован, теперь объект Player будет инициализирован.
+                initPlayer();
+                console.log('auth ok');
+            }).catch(() => {
+                 // Игрок не авторизован.
+                 console.log('auth failed');
+            });
+      }
+
+      function initPlayer(){
+        return sdk.getPlayer().then(_player => {
+                player = _player;       
+            }).catch(err => {
+                // Если игрок не авторизован, выбрасывает исключение USER_NOT_AUTHORIZED.
+            });
       }
 
       function getUserData(){
-        vkBridge.send("VKWebAppStorageGet",{"keys":["_save"]}).then(data =>{
-        console.log(data);
-        newInstance.SendMessage('VKSDK', 'DataGetting', JSON.stringify(data));
-      });}
-
-      function setUserData(data){
-        console.log(data);
-        vkBridge.send('VKWebAppStorageSet',{"key": "_save" , "value": data}).then(_info =>{
-          console.log("Saved!")});
+        if(initPlayer){
+          var data = {"id" : player.getID(), "name" : player.getName(), "avatarUrlSmall" : player.getPhoto('small'), "avatarUrlMedium" : player.getPhoto('medium'), "avatarUrlLarge" : player.getPhoto('large')};
+          newInstance.SendMessage('YandexSDK', 'StoreUserData', JSON.stringify(data));
+        }
       }
 
       function showFullscrenAd(){
-        vkBridge.send('VKWebAppShowNativeAds',{ad_format:"interstitial"}).then(data => {
-          console.log(data);});
+        sdk.adv.showFullscreenAdv({
+          callbacks: {
+            onClose: function(wasShown) {
+              newInstance.SendMessage('YandexSDK', 'OnInterstitialShown');
+            },
+            onError: function(error) {
+              newInstance.SendMessage('YandexSDK', 'OnInterstitialFailed', error);
+            }
+          }
+        })
       }
 
-      function showRewardedAd(){
-        vkBridge.send('VKWebAppShowNativeAds',{ad_format:"reward"})
-		.then(data => {
-          console.log(data.result);
-          newInstance.SendMessage('VKSDK', 'RewardGetting', JSON.stringify(data.result));})
-		  
-		.catch(error =>{
-		  console.log(error);
-		  newInstance.SendMessage('VKSDK', 'RewardGetError', JSON.stringify(error));})
+      function showRewardedAd(id){
+        sdk.adv.showRewardedVideo({
+        callbacks: {
+            onOpen: () => {
+                newInstance.SendMessage('YandexSDK', 'OnRewardedOpen', id);
+                console.log('Video ad open. Id: ' + id);
+            },
+            onRewarded: () => {
+                newInstance.SendMessage('YandexSDK', 'OnRewarded', id);
+                console.log('Rewarded! Id: ' + id);
+            },
+            onClose: () => {
+                newInstance.SendMessage('YandexSDK', 'OnRewardedClose', id);
+                console.log('Video ad closed. Id: ' + id);
+            }, 
+            onError: (e) => {
+                var data = {"id" : id, "error" : error};
+                newInstance.SendMessage('YandexSDK', 'OnRewardedError', JSON.stringify(data));
+                console.log('Error while open video ad:', e);
+            }
+          }
+        })
       }
-	  
-	   function posting(level){
-        vkBridge.send("VKWebAppShowWallPostBox", {
-		"message": "Ура! Я наконец то дошел до " + level + " Уровня!! А Ты сможешь?",
-		"attachments": [
-    			"https://vk.com/app51416307",
-   			"photo-215578269_457239019"
-  		]				 				 
-		});
+
+      function initPayments(){
+        sdk.getPayments().then(_payments => {
+          // Покупки доступны.
+          payments = _payments;
+        }).catch(err => {
+        })
       }
-	  
-	  function group(){
-        vkBridge.send("VKWebAppJoinGroup", {"group_id": 215578269});
+
+      function buy(id){
+        payments.purchase(id).then(purchase => {
+          // Покупка успешно совершена!
+          newInstance.SendMessage('YandexSDK', 'OnPurchaseSuccess', id);
+        }).catch(err => {
+          // Покупка не удалась: в консоли разработчика не добавлен товар с таким id,
+          // пользователь не авторизовался, передумал и закрыл окно оплаты,
+          // истекло отведенное на покупку время, не хватило денег и т. д.
+          newInstance.SendMessage('YandexSDK', 'OnPurchaseFailed', err);
+        })
       }
-	  
-	  function friends(){
-       vkBridge.send("VKWebAppShowInviteBox", {})
-         .then(data => console.log(data.success))  
-        .catch(error => console.log(error));
-      }
+
+      window.onbeforeunload = function(e) {
+        console.log("Calling OnClose from Browser!");
+        gameInstance.SendMessage("YandexSDK", "OnClose");
+    
+        var dialogText = "You game has been saved!  Would you like to continue unloading the page?";
+        e.returnValue = dialogText;
+        return dialogText;
+      };
 	  
       document.body.appendChild(script);
     </script>
