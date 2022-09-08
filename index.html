@@ -156,9 +156,11 @@
  		 switch(event.detail.type) {
     			case "VKWebAppViewHide":
 				newInstance.SendMessage('VKSDK', 'AppPause');
+				 console.log("pause");
       			break;
     			case "VKWebAppViewRestore":
 				 newInstance.SendMessage('VKSDK', 'AppNotPause');
+				 console.log("NotPause");
       			break;
 		 }
 		});
