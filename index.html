@@ -92,6 +92,23 @@
       };
 	  
 	  vkBridge.send('VKWebAppInit');
+	    
+	  vkBridge.subscribe(event => {
+  		if (!event.detail) {
+    			return;
+ 		 }
+
+ 		 switch(event.detail.type) {
+    			case "VKWebAppViewHide":
+				newInstance.SendMessage('VKSDK', 'AppPause');
+				 console.log("pause");
+      			break;
+    			case "VKWebAppViewRestore":
+				 newInstance.SendMessage('VKSDK', 'AppNotPause');
+				 console.log("NotPause");
+      			break;
+		 }
+		});
 	  
 	  function auth(){
         vkBridge.send('VKWebAppGetUserInfo').then(_info =>{
@@ -148,22 +165,7 @@
         .catch(error => console.log(error));
       }
 	  
-	    vkBridge.subscribe(event => {
-  		if (!event.detail) {
-    			return;
- 		 }
-
- 		 switch(event.detail.type) {
-    			case "VKWebAppViewHide":
-				newInstance.SendMessage('VKSDK', 'AppPause');
-				 console.log("pause");
-      			break;
-    			case "VKWebAppViewRestore":
-				 newInstance.SendMessage('VKSDK', 'AppNotPause');
-				 console.log("NotPause");
-      			break;
-		 }
-		});
+	    
 	  
       document.body.appendChild(script);
     </script>
