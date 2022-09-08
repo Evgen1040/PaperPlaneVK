@@ -149,19 +149,7 @@
         .catch(error => console.log(error));
       }
 	  
-		{
-		"type": "VKWebAppViewHide",
-		"data": {
-			newInstance.SendMessage('VKSDK', 'AppPause');
-			}
-		}
-		
-		{
-			"type": "VKWebAppViewRestore",
-			"data": {
-				newInstance.SendMessage('VKSDK', 'AppNotPause');
-					}
-		}
+
 	  
       document.body.appendChild(script);
     </script>
