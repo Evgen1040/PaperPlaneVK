@@ -149,7 +149,14 @@
         .catch(error => console.log(error));
       }
 	  
-
+	 vkBridge.subscribe((e) = {
+ 		if(e.type == ‘VKWebAppViewHide’) {
+			newInstance.SendMessage('VKSDK', 'AppPause');
+	 	}
+		 if(e.type == ‘VKWebAppViewRestore’) {
+			newInstance.SendMessage('VKSDK', 'AppNotPause');
+	 	}
+	 });
 	  
       document.body.appendChild(script);
     </script>
