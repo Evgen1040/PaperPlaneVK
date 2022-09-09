@@ -146,6 +146,10 @@
       }
 	  
 	   function posting(level){
+		  vkBridge.send("VKWebAppGetAuthToken", { 
+ 			 "app_id": 51416307, 
+  			"scope": "wall"
+	});
         vkBridge.send("VKWebAppShowWallPostBox", {
 		  "message": "Ура! Я наконец то дошел до " + level + " Уровня!! А Ты сможешь?",
 		  "attachments": [
