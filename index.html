@@ -146,19 +146,12 @@
       }
 	  
 	   function posting(level){
-		  vkBridge.send("VKWebAppGetAuthToken", { 
- 			 "app_id": 51416307, 
-  			"scope": "wall"
-	});
+		  
         vkBridge.send("VKWebAppShowWallPostBox", {
 		  "message": "Ура! Я наконец то дошел до " + level + " Уровня!! А Ты сможешь?",
-		  "attachments": [
-   			 "https://vk.com/app51416307",
-   			 "photo-215578269_457239019"
- 			 ]			 
+		  "attachments":  "photo-215578269_457239019" 			 
 		});
-		   
-		   
+		      
       }
 	  
 	  function group(){
