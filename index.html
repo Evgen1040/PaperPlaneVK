@@ -147,8 +147,11 @@
 	  
 	   function posting(level){
         vkBridge.send("VKWebAppShowWallPostBox", {
-		  "message": "Ура! Я наконец то дошел до " + level + " Уровня!! А Ты сможешь? (https://vk.com/app51416307)",
-			 				 
+		  "message": "Ура! Я наконец то дошел до " + level + " Уровня!! А Ты сможешь?",
+		  "attachments": [
+   			 "https://vk.com/app51416307",
+   			 "photo-215578269_457239019"
+ 			 ]			 
 		});
 		   
 		   
@@ -169,3 +172,5 @@
       document.body.appendChild(script);
     </script>
   </body>
+</html>	
+	
